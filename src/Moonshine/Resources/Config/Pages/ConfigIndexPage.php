@@ -24,9 +24,45 @@ class ConfigIndexPage extends IndexPage
         return [
             ID::make('ID', 'config_id'),
             Text::make('Path', 'path', formatted: static fn (ConfigModel $item): ?string => $item->coreConfig?->path),
-            Text::make('Value', 'value', formatted: static fn (ConfigModel $item): mixed => $item->coreConfig?->value),
-            Text::make('Label', 'label'),
+            Text::make('Value', 'value', formatted: static fn (ConfigModel $item): mixed => self::formatValue($item)),
+            Text::make('Label', 'label', formatted: static fn (ConfigModel $item): ?string => self::formatLabel($item)),
             Text::make('Backend', 'backend_type'),
         ];
+    }
+
+    static public function formatValue($item): string
+    {
+        $value = $item->coreConfig?->value;
+
+        if ($value === null) {
+            return '';
+        }
+
+        if ($item->backend_type === 'select') {
+            if (is_array($item->source)) {
+                return $item->source[$value] ?? '';
+            }
+            return $value;
+        }
+
+        if ($item->backend_type === 'list') {
+            if (is_array($value)) {
+                return implode(', ', $value);
+            }
+            return '';
+        }
+
+        if (is_array($value)) {
+            return '';
+        }
+
+        return $value ?: '';
+    }
+
+    static public function formatLabel($item): string
+    {
+        $label = __($item->label);
+
+        return $label ?: '';
     }
 }
