@@ -13,4 +13,10 @@ return [
         'settings' => \Bulbalara\CoreConfigMs\Moonshine\Pages\ConfigPage::class,
     ],
     'add_to_menu' => true,
+    'cache' => [
+        'enabled' => true,
+        'key' => 'bl_config_cache',
+        'ttl' => 60,
+        'forever' => true,
+    ],
 ];

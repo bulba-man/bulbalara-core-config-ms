@@ -21,12 +21,6 @@
         "bulbalara/core-config": ">=1.0|dev-bulba",
         "moonshine/moonshine": ">=4.0"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/bulba-man/bulbalara-core-config.git"
-        }
-    ],
     "extra": {
         "laravel": {
             "providers": [
