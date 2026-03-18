@@ -60,7 +60,7 @@ final class ConfigSaveHandler
             throw new ResourceException($queryException->getMessage(), previous: $queryException);
         }
 
-        Cache::forget(config('bl.config.cache.key', 'bl_config_cache'));
+        Cache::forget(config('bl_config.cache.key', 'bl_config_cache'));
 
         return $model;
     }

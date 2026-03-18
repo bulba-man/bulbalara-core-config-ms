@@ -56,7 +56,7 @@ class ConfigPage extends Page
 
     public function getTitle(): string
     {
-        return __('bl.config::core_config.menu_config_label');
+        return __('bl_config::ui.page_titles.config_page');
     }
 
     /**
@@ -78,7 +78,7 @@ class ConfigPage extends Page
     {
         return [
             Flex::make([
-                ActionButton::make(__('Управление'), app(ConfigResource::class)->getIndexPageUrl())
+                ActionButton::make(__('bl_config::ui.manage_button'), app(ConfigResource::class)->getIndexPageUrl())
                     ->primary()
                     ->icon('rectangle-stack'),
             ])->itemsAlign('center')->justifyAlign('end')->customAttributes([
@@ -141,7 +141,7 @@ class ConfigPage extends Page
             throw new ResourceException($queryException->getMessage(), previous: $queryException);
         }
 
-        Cache::forget(config('bl.config.cache.key', 'bl_config_cache'));
+        Cache::forget(config('bl_config.cache.key', 'bl_config_cache'));
 
         return back();
     }
@@ -263,7 +263,7 @@ class ConfigPage extends Page
 
     private function getTabLabel(string $section): string
     {
-        $key = "bl.config::core_config.config.$section.tab_label";
+        $key = "bl_config::config.$section.tab_label";
         $label = __($key);
 
         return $label !== $key ? $label : ucfirst($section);
@@ -271,7 +271,7 @@ class ConfigPage extends Page
 
     private function getGroupLabel(string $section, string $group): string
     {
-        $key = "bl.config::core_config.config.$section.$group.group_label";
+        $key = "bl_config::config.$section.$group.group_label";
         $label = __($key);
 
         return $label !== $key ? $label : ucfirst($group);

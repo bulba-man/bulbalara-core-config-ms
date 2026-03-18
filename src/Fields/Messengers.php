@@ -12,14 +12,14 @@ class Messengers extends Json
     {
         $parent = parent::make(...$arguments);
         $parent->removable()->fields([
-            Image::make(__('bl.config::core_config.config.contacts.general.messengers_icon'), 'icon')
+            Image::make(__('bl_config::config.contacts.general.messengers_icon'), 'icon')
                 ->nullable()
                 ->dir('images/icons/messengers')
                 ->allowedExtensions(['jpg', 'jpeg', 'png', 'webp', 'gif'])
                 ->removable()
                 ->keepOriginalFileName(),
-            Text::make(__('bl.config::core_config.config.contacts.general.messengers_name'), 'name'),
-            Text::make(__('bl.config::core_config.config.contacts.general.messengers_value'), 'value'),
+            Text::make(__('bl_config::config.contacts.general.messengers_name'), 'name'),
+            Text::make(__('bl_config::config.contacts.general.messengers_value'), 'value'),
         ]);
 
         return $parent;

@@ -33,11 +33,11 @@ class ConfigFormPage extends FormPage
     {
         return [
             Box::make([
-                $this->coreField(Text::make('Path', 'path')->required(), 'path'),
-                $this->coreField(Textarea::make('Value', 'value')->nullable(), 'value'),
-                $this->coreField(Textarea::make('Default', 'default')->nullable(), 'default'),
+                $this->coreField(Text::make(__('bl_config::form.path'), 'path')->required(), 'path'),
+                $this->coreField(Textarea::make(__('bl_config::form.value'), 'value')->nullable(), 'value'),
+                $this->coreField(Textarea::make(__('bl_config::form.default'), 'default')->nullable(), 'default'),
                 $this->coreField(
-                    Select::make('Cast', 'cast')
+                    Select::make(__('bl_config::form.cast'), 'cast')
                         ->nullable()
                         ->options([
                             'string' => 'string',
@@ -54,17 +54,17 @@ class ConfigFormPage extends FormPage
                     'cast'
                 ),
 
-                Text::make('Backend type', 'backend_type')
-                    ->hint('Например: text, textarea, email, select, image, json, file или FQCN поля MoonShine')
+                Text::make(__('bl_config::form.backend_type'), 'backend_type')
+                    ->hint(__('bl_config::form.backend_type_hint'))
                     ->nullable(),
-                Textarea::make('Source (JSON)', 'source')->nullable(),
-                Switcher::make('Resettable', 'resettable')->default(true),
-                Text::make('Rules', 'rules')->nullable(),
-                Text::make('Depends of', 'depends_of')->nullable(),
-                Text::make('Depends value', 'depends_val')->nullable(),
-                Text::make('Label', 'label')->nullable(),
-                Textarea::make('Description', 'description')->nullable(),
-                Number::make('Order', 'order')->default(0),
+                Textarea::make(__('bl_config::form.source'), 'source')->nullable(),
+                Switcher::make(__('bl_config::form.resettable'), 'resettable')->default(true),
+                Text::make(__('bl_config::form.rules'), 'rules')->nullable(),
+                Text::make(__('bl_config::form.depends_of'), 'depends_of')->nullable(),
+                Text::make(__('bl_config::form.depends_val'), 'depends_val')->nullable(),
+                Text::make(__('bl_config::form.label'), 'label')->nullable(),
+                Textarea::make(__('bl_config::form.description'), 'description')->nullable(),
+                Number::make(__('bl_config::form.order'), 'order')->default(0),
                 $this->methodsField(),
             ]),
         ];
@@ -72,7 +72,7 @@ class ConfigFormPage extends FormPage
 
     protected function rules(DataWrapperContract $item): array
     {
-        $configTable = config('bl.config.db.table', 'core_config');
+        $configTable = config('bl_config.db.table', 'core_config');
         $ignoreId = $item->getOriginal()?->coreConfig?->getKey();
 
         return [
@@ -100,11 +100,11 @@ class ConfigFormPage extends FormPage
 
     private function methodsField(): FieldContract
     {
-        return Json::make('Methods', 'methods')
+        return Json::make(__('bl_config::form.methods'), 'methods')
             ->fields([
-                Text::make('Method', 'key')->required(),
-                Json::make('Arguments', 'arguments')
-                    ->keyValue('Argument', 'Value'),
+                Text::make(__('bl_config::form.method_key'), 'key')->required(),
+                Json::make(__('bl_config::form.method_arguments'), 'arguments')
+                    ->keyValue(__('bl_config::form.method_arguments_key'), __('bl_config::form.method_arguments_value')),
             ])
             ->removable()
             ->nullable()

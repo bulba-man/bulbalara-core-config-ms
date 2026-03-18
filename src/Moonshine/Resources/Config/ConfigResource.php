@@ -23,10 +23,13 @@ class ConfigResource extends ModelResource
 {
     protected string $model = ConfigModel::class;
 
-    protected string $title = 'Configs';
-
     protected array $with = ['coreConfig'];
 
+    public function getTitle(): string
+    {
+        return __('bl_config::ui.page_titles.management_page');
+    }
+    
     /**
      * @return list<class-string<PageContract>>
      */

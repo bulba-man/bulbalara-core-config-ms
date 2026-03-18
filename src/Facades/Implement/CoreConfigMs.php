@@ -11,24 +11,24 @@ use Illuminate\Support\Arr;
 class CoreConfigMs
 {
     public static $configTabLabels = [
-        'mail' => 'bl.config::core_config.config.mail.tab_label',
-        'general' => 'bl.config::core_config.config.general.tab_label',
-        'web' => 'bl.config::core_config.config.web.tab_label',
-        'design' => 'bl.config::core_config.config.design.tab_label',
-        'seo' => 'bl.config::core_config.config.seo.tab_label',
-        'contacts' => 'bl.config::core_config.config.contacts.tab_label',
+        'mail' => 'bl_config::config.mail.tab_label',
+        'general' => 'bl_config::config.general.tab_label',
+        'web' => 'bl_config::config.web.tab_label',
+        'design' => 'bl_config::config.design.tab_label',
+        'seo' => 'bl_config::config.seo.tab_label',
+        'contacts' => 'bl_config::config.contacts.tab_label',
     ];
 
     public static $configTabGroupLabels = [
-        'mail.transport' => 'bl.config::core_config.config.mail.transport.group_label',
-        'mail.addresses' => 'bl.config::core_config.config.mail.addresses.group_label',
-        'general.general' => 'bl.config::core_config.config.general.general.group_label',
-        'web.assets' => 'bl.config::core_config.config.web.assets.group_label',
-        'design.head' => 'bl.config::core_config.config.design.head.group_label',
-        'design.header' => 'bl.config::core_config.config.design.header.group_label',
-        'design.footer' => 'bl.config::core_config.config.design.footer.group_label',
-        'seo.defaults' => 'bl.config::core_config.config.seo.defaults.group_label',
-        'contacts.general' => 'bl.config::core_config.config.contacts.general.group_label',
+        'mail.transport' => 'bl_config::config.mail.transport.group_label',
+        'mail.addresses' => 'bl_config::config.mail.addresses.group_label',
+        'general.general' => 'bl_config::config.general.general.group_label',
+        'web.assets' => 'bl_config::config.web.assets.group_label',
+        'design.head' => 'bl_config::config.design.head.group_label',
+        'design.header' => 'bl_config::config.design.header.group_label',
+        'design.footer' => 'bl_config::config.design.footer.group_label',
+        'seo.defaults' => 'bl_config::config.seo.defaults.group_label',
+        'contacts.general' => 'bl_config::config.contacts.general.group_label',
     ];
 
     /**

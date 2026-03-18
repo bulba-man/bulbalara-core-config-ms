@@ -23,10 +23,10 @@ class ConfigIndexPage extends IndexPage
     {
         return [
             ID::make('ID', 'config_id'),
-            Text::make('Path', 'path', formatted: static fn (ConfigModel $item): ?string => $item->coreConfig?->path),
-            Text::make('Value', 'value', formatted: static fn (ConfigModel $item): mixed => self::formatValue($item)),
-            Text::make('Label', 'label', formatted: static fn (ConfigModel $item): ?string => self::formatLabel($item)),
-            Text::make('Backend', 'backend_type'),
+            Text::make(__('bl_config::form.path'), 'path', formatted: static fn (ConfigModel $item): ?string => $item->coreConfig?->path),
+            Text::make(__('bl_config::form.value'), 'value', formatted: static fn (ConfigModel $item): mixed => self::formatValue($item)),
+            Text::make(__('bl_config::form.label'), 'label', formatted: static fn (ConfigModel $item): ?string => self::formatLabel($item)),
+            Text::make(__('bl_config::form.backend'), 'backend_type'),
         ];
     }
 

@@ -13,14 +13,14 @@ class Socials extends Json
     {
         $parent = parent::make(...$arguments);
         $parent->removable()->fields([
-            Image::make(__('bl.config::core_config.config.contacts.general.socials_icon'), 'icon')
+            Image::make(__('bl_config::config.contacts.general.socials_icon'), 'icon')
                 ->nullable()
                 ->dir('images/icons/social')
                 ->allowedExtensions(['jpg', 'jpeg', 'png', 'webp', 'gif'])
                 ->removable()
                 ->keepOriginalFileName(),
-            Text::make(__('bl.config::core_config.config.contacts.general.messengers_name'), 'name'),
-            Url::make(__('bl.config::core_config.config.contacts.general.socials_url'), 'url'),
+            Text::make(__('bl_config::config.contacts.general.messengers_name'), 'name'),
+            Url::make(__('bl_config::config.contacts.general.socials_url'), 'url'),
         ]);
 
         return $parent;

@@ -19,8 +19,8 @@ class ConfigModel extends Model
     public function __construct($attributes = [])
     {
         parent::__construct($attributes);
-        $connection = config('bl.config.database.connection') ?: config('database.default');
-        $table = config('bl.config.db.table', 'core_config_admin');
+        $connection = config('bl_config.database.connection') ?: config('database.default');
+        $table = config('bl_config.db.table', 'core_config_admin');
 
         $this->setConnection($connection);
         $this->setTable($table);

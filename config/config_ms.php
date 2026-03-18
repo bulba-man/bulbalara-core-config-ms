@@ -19,4 +19,17 @@ return [
         'ttl' => 60,
         'forever' => true,
     ],
+    'classes' => [
+        'model_base' => \Bulbalara\CoreConfig\Models\Config::class,
+        'model' => \Bulbalara\CoreConfigMs\ConfigModel::class,
+        'loader' => \Bulbalara\CoreConfigMs\Services\LoadConfig::class,
+        'handlers' => [
+            'before_merge' => [
+                \Bulbalara\CoreConfigMs\Handlers\Before::class,
+            ],
+            'after_merge' => [
+                \Bulbalara\CoreConfigMs\Handlers\After::class,
+            ],
+        ],
+    ],
 ];
