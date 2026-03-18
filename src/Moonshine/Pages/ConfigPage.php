@@ -9,6 +9,7 @@ use Bulbalara\CoreConfigMs\Moonshine\Resources\Config\ConfigResource;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
@@ -139,6 +140,8 @@ class ConfigPage extends Page
         } catch (QueryException $queryException) {
             throw new ResourceException($queryException->getMessage(), previous: $queryException);
         }
+
+        Cache::forget(config('bl.config.cache.key', 'bl_config_cache'));
 
         return back();
     }

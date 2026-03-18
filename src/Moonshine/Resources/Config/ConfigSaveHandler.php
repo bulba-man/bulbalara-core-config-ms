@@ -8,6 +8,7 @@ use Bulbalara\CoreConfig\Models\Config;
 use Bulbalara\CoreConfigMs\ConfigModel;
 use Bulbalara\CoreConfigMs\Support\MethodsTransformer;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Cache;
 use MoonShine\Core\Exceptions\ResourceException;
 
 final class ConfigSaveHandler
@@ -58,6 +59,8 @@ final class ConfigSaveHandler
         } catch (QueryException $queryException) {
             throw new ResourceException($queryException->getMessage(), previous: $queryException);
         }
+
+        Cache::forget(config('bl.config.cache.key', 'bl_config_cache'));
 
         return $model;
     }

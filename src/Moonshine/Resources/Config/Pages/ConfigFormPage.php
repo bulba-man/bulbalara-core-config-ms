@@ -33,13 +33,6 @@ class ConfigFormPage extends FormPage
     {
         return [
             Box::make([
-                //                TableBuilder::make()
-                //                    ->fields([
-                //                        ID::make(),
-                //                        Text::make('Text')
-                //                    ])
-                //                    ->cast(new ModelCaster(Comment::class))
-                //                    ->items($this->getResource()->getItem()?->comments ?? []),
                 $this->coreField(Text::make('Path', 'path')->required(), 'path'),
                 $this->coreField(Textarea::make('Value', 'value')->nullable(), 'value'),
                 $this->coreField(Textarea::make('Default', 'default')->nullable(), 'default'),
