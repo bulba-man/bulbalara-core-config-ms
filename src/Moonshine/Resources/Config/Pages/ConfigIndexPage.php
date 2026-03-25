@@ -56,7 +56,7 @@ class ConfigIndexPage extends IndexPage
             return '';
         }
 
-        return $value ?: '';
+        return (string) $value ?: '';
     }
 
     static public function formatLabel($item): string
