@@ -12,6 +12,15 @@ return [
     'pages' => [
         'settings' => \Bulbalara\CoreConfigMs\Moonshine\Pages\ConfigPage::class,
     ],
+    'page_policy' => [
+        'settings' => \Bulbalara\CoreConfigMs\Policies\ConfigPolicy::class,
+    ],
+    'resources' => [
+        'management' => \Bulbalara\CoreConfigMs\Moonshine\Resources\Config\ConfigResource::class,
+    ],
+    'resource_policy' => [
+        'management' => \Bulbalara\CoreConfigMs\Policies\ConfigManagementPolicy::class,
+    ],
     'add_to_menu' => true,
     'cache' => [
         'enabled' => true,

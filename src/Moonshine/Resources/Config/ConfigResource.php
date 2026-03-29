@@ -29,7 +29,7 @@ class ConfigResource extends ModelResource
     {
         return __('bl_config::ui.page_titles.management_page');
     }
-    
+
     /**
      * @return list<class-string<PageContract>>
      */
@@ -74,5 +74,10 @@ class ConfigResource extends ModelResource
         }
 
         return $this->getIndexPageUrl();
+    }
+
+    public function isWithPolicy(): bool
+    {
+        return !empty(config('bl_config.resource_policy.management', ''));
     }
 }

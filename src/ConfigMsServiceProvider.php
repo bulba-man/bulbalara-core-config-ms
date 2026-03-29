@@ -3,7 +3,6 @@
 namespace Bulbalara\CoreConfigMs;
 
 use Bulbalara\CoreConfigMs\Moonshine\Pages\ConfigPage;
-use Bulbalara\CoreConfigMs\Moonshine\Resources\Config\ConfigResource;
 use Bulbalara\CoreConfigMs\Services\LoadConfigInterface;
 use Illuminate\Support\ServiceProvider;
 use MoonShine\Contracts\Core\DependencyInjection\CoreContract;
@@ -43,11 +42,10 @@ class ConfigMsServiceProvider extends ServiceProvider
     protected function registerMoonshine(CoreContract $core, MenuManagerContract $menu): void
     {
         $pages = config('bl_config.pages', []);
+        $resources = config('bl_config.resources', []);
 
         $core
-            ->resources([
-                ConfigResource::class,
-            ])
+            ->resources(array_values($resources))
             ->pages(array_values($pages));
 
         if (config('bl_config.add_to_menu')) {
@@ -58,6 +56,14 @@ class ConfigMsServiceProvider extends ServiceProvider
                     MenuItem::make($settingsPage, __('bl_config::ui.menu.config_page')),
                 ]);
             }
+        }
+
+        if (!empty(config('bl_config.resource_policy.management', ''))) {
+            \Illuminate\Support\Facades\Gate::policy(ConfigModel::class, config('bl_config.resource_policy.management', ''));
+        }
+
+        if (!empty(config('bl_config.page_policy.settings', '')) && config('bl_config.pages.settings')) {
+            \Illuminate\Support\Facades\Gate::policy(config('bl_config.pages.settings'), config('bl_config.page_policy.settings'));
         }
     }
 

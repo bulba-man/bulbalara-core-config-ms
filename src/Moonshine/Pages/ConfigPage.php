@@ -11,13 +11,16 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Core\Exceptions\ResourceException;
+use MoonShine\Laravel\MoonShineAuth;
 use MoonShine\Laravel\Pages\Page;
 use MoonShine\Laravel\TypeCasts\ModelDataWrapper;
 use MoonShine\Support\Attributes\AsyncMethod;
 use MoonShine\Support\Attributes\Icon;
+use MoonShine\Support\Enums\Ability;
 use MoonShine\UI\Components\ActionButton;
 use MoonShine\UI\Components\FormBuilder;
 use MoonShine\UI\Components\Layout\Box;
@@ -40,10 +43,13 @@ use MoonShine\UI\Fields\Switcher;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 use MoonShine\UI\Fields\Url;
+use Bulbalara\CoreConfigMs\Policies\ConfigPageAbility;
+use MoonShine\Contracts\UI\HasFieldsContract;
 
 #[Icon('cog-6-tooth')]
 class ConfigPage extends Page
 {
+
     private ?Collection $configs = null;
 
     /**
@@ -85,27 +91,41 @@ class ConfigPage extends Page
                     ->icon('rectangle-stack'),
             ])->itemsAlign('center')->justifyAlign('end')->customAttributes([
                 'style' => 'margin-bottom: 12px;',
-            ]),
+            ])->canSee(function () {
+                if (empty(config('bl_config.resource_policy.management', ''))) {
+                    return true;
+                }
+
+                return Gate::forUser(MoonShineAuth::getGuard()->user())->allows(Ability::VIEW_ANY, ConfigModel::class);
+            }),
             $this->getForm(),
         ];
     }
 
     public function getForm(): FormBuilder
     {
-        return FormBuilder::make()
+        $form = FormBuilder::make()
             ->name('config-form')
             ->class('config-form')
             ->fields($this->fields())
             ->fill($this->getValues())
-            ->asyncMethod('save', __('moonshine::ui.saved'), page: $this)
-            ->submit(__('moonshine::ui.save'), [
-                'class' => 'btn-primary btn-lg',
-            ]);
+            ->asyncMethod('save', __('moonshine::ui.saved'), page: $this);
+
+        $submitButton = $form->getSubmit();
+        $submitButton->customAttributes(['class' => 'btn-primary btn-lg',])
+            ->canSee(fn() => $this->checkPolicy(ConfigPageAbility::SAVE));
+        $form->submit(button: $submitButton);
+
+        return $form;
     }
 
     #[AsyncMethod]
     public function save(): RedirectResponse
     {
+        if (!$this->checkPolicy(ConfigPageAbility::VIEW_PAGE) || !$this->checkPolicy(ConfigPageAbility::SAVE)) {
+            abort(403);
+        }
+
         $form = $this->getForm();
         $fields = $form->getFields()->onlyFields();
 
@@ -148,6 +168,15 @@ class ConfigPage extends Page
         return back();
     }
 
+    protected function prepareBeforeRender(): void
+    {
+        parent::prepareBeforeRender();
+
+        if (!$this->checkPolicy(ConfigPageAbility::VIEW_PAGE)) {
+            abort(403);
+        }
+    }
+
     /**
      * @return list<Tab>
      */
@@ -157,10 +186,38 @@ class ConfigPage extends Page
         $grouped = $this->groupConfigs();
 
         foreach ($grouped as $section => $groups) {
+            if (!$this->checkPolicy(ConfigPageAbility::VIEW_TAB, $section)) {
+                continue;
+            }
+
+            $canEditTab = $this->checkPolicy(ConfigPageAbility::EDIT_TAB, $section);
+
             $groupFields = [];
 
             foreach ($groups as $group => $configs) {
-                $fields = $this->buildGroupFields($configs);
+                if (!$this->checkPolicy(ConfigPageAbility::VIEW_GROUP, [$section, $group])) {
+                    continue;
+                }
+
+                $canEditGroup = $this->checkPolicy(ConfigPageAbility::EDIT_GROUP, [$section, $group]);
+                $groupReadOnly = !$canEditTab || !$canEditGroup;
+
+                $rawFields = $this->buildGroupFields($configs);
+                $fields = [];
+                foreach ($rawFields as $field) {
+                    if (!$this->checkPolicy(ConfigPageAbility::VIEW_FIELD, [$section, $group, $field])) {
+                        continue;
+                    }
+
+                    $canEditField = $this->checkPolicy(ConfigPageAbility::EDIT_FIELD, [$section, $group, $field]);
+                    $fieldReadOnly = $groupReadOnly || !$canEditField;
+
+                    if ($fieldReadOnly) {
+                        $this->setFieldReadOnly($field);
+                    }
+
+                    $fields[] = $field;
+                }
 
                 if ($fields === []) {
                     continue;
@@ -447,5 +504,46 @@ class ConfigPage extends Page
         $decoded = json_decode($options, true);
 
         return is_array($decoded) ? $decoded : [];
+    }
+
+    protected function setFieldReadOnly(FieldContract $field): void
+    {
+        if ($field instanceof HasFieldsContract) {
+            $field->getFields()->each(function ($field) {
+                if ($field instanceof FieldContract) {
+                    $this->setFieldReadOnly($field);
+                }
+            });
+
+            $traits = class_uses_recursive($field);
+
+            if (in_array(\MoonShine\UI\Traits\Removable::class, $traits)) {
+                $field->removable(false);
+            }
+
+            if ($field instanceof \MoonShine\UI\Fields\Json) {
+                $field->creatable(false);
+            }
+
+            return;
+        }
+
+        $field->readonly();
+    }
+
+    protected function checkPolicy(ConfigPageAbility $ability, $arguments = []): bool
+    {
+        if (empty(config('bl_config.page_policy.settings', ''))) {
+            return true;
+        }
+
+        if (!is_array($arguments)) {
+            $arguments = [$arguments];
+        }
+
+        array_unshift($arguments, config('bl_config.pages.settings'));
+
+        return Gate::forUser(MoonShineAuth::getGuard()->user())
+            ->allows($ability, $arguments);
     }
 }
