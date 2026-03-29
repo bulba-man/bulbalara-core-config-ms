@@ -3,10 +3,13 @@
 namespace Bulbalara\CoreConfigMs;
 
 use Bulbalara\CoreConfigMs\Moonshine\Pages\ConfigPage;
+use Bulbalara\CoreConfigMs\Policies\ConfigPageAbility;
 use Bulbalara\CoreConfigMs\Services\LoadConfigInterface;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use MoonShine\Contracts\Core\DependencyInjection\CoreContract;
 use MoonShine\Contracts\MenuManager\MenuManagerContract;
+use MoonShine\Laravel\MoonShineAuth;
 use MoonShine\MenuManager\MenuItem;
 
 class ConfigMsServiceProvider extends ServiceProvider
@@ -48,22 +51,28 @@ class ConfigMsServiceProvider extends ServiceProvider
             ->resources(array_values($resources))
             ->pages(array_values($pages));
 
-        if (config('bl_config.add_to_menu')) {
-            $settingsPage = $pages['settings'] ?? ConfigPage::class;
-
-            if (is_string($settingsPage)) {
-                $menu->add([
-                    MenuItem::make($settingsPage, __('bl_config::ui.menu.config_page')),
-                ]);
-            }
-        }
-
         if (!empty(config('bl_config.resource_policy.management', ''))) {
             \Illuminate\Support\Facades\Gate::policy(ConfigModel::class, config('bl_config.resource_policy.management', ''));
         }
 
         if (!empty(config('bl_config.page_policy.settings', '')) && config('bl_config.pages.settings')) {
             \Illuminate\Support\Facades\Gate::policy(config('bl_config.pages.settings'), config('bl_config.page_policy.settings'));
+        }
+
+        if (config('bl_config.add_to_menu')) {
+            $settingsPage = $pages['settings'] ?? ConfigPage::class;
+
+            if (is_string($settingsPage)) {
+                $menu->add([
+                    MenuItem::make($settingsPage, __('bl_config::ui.menu.config_page'))->canSee(function () {
+                        if (empty(config('bl_config.page_policy.settings', ''))) {
+                            return true;
+                        }
+
+                        return Gate::forUser(MoonShineAuth::getGuard()->user())->allows(ConfigPageAbility::VIEW_PAGE, config('bl_config.pages.settings'));
+                    }),
+                ]);
+            }
         }
     }
 
