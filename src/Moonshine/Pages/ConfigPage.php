@@ -17,6 +17,7 @@ use MoonShine\Core\Exceptions\ResourceException;
 use MoonShine\Laravel\Pages\Page;
 use MoonShine\Laravel\TypeCasts\ModelDataWrapper;
 use MoonShine\Support\Attributes\AsyncMethod;
+use MoonShine\Support\Attributes\Icon;
 use MoonShine\UI\Components\ActionButton;
 use MoonShine\UI\Components\FormBuilder;
 use MoonShine\UI\Components\Layout\Box;
@@ -40,6 +41,7 @@ use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 use MoonShine\UI\Fields\Url;
 
+#[Icon('cog-6-tooth')]
 class ConfigPage extends Page
 {
     private ?Collection $configs = null;
