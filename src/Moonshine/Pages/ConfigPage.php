@@ -526,7 +526,7 @@ class ConfigPage extends Page
 
     private function configureEscapingOnApply(FieldContract $field): FieldContract
     {
-        if (! is_callable([$field, 'isUnescape']) || ! is_callable([$field, 'escapeOnApply'])) {
+        if (! method_exists($field, 'isUnescape') || ! method_exists($field, 'escapeOnApply')) {
             return $field;
         }
 
