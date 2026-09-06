@@ -414,7 +414,9 @@ class ConfigPage extends Page
             }
         }
 
-        return $this->applyFieldMethods($field, $config->methods);
+        $field = $this->applyFieldMethods($field, $config->methods);
+
+        return $this->configureEscapingOnApply($field);
     }
 
     private function makeFieldByType(ConfigModel $config, string $label, string $path): ?FieldContract
@@ -517,6 +519,19 @@ class ConfigPage extends Page
             if ($result instanceof FieldContract) {
                 $field = $result;
             }
+        }
+
+        return $field;
+    }
+
+    private function configureEscapingOnApply(FieldContract $field): FieldContract
+    {
+        if (! is_callable([$field, 'isUnescape']) || ! is_callable([$field, 'escapeOnApply'])) {
+            return $field;
+        }
+
+        if ($field->isUnescape()) {
+            $field->escapeOnApply(static fn (): bool => false);
         }
 
         return $field;
