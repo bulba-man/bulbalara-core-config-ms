@@ -52,6 +52,26 @@ general.general.site_name
 - группу `general`
 - поле `site_name`
 
+Также поддерживаются подгруппы:
+```
+{tab}.{group}.{subgroup}.{field}
+```
+Пример:
+```
+mail.smtp.security.encryption
+```
+Это создаст:
+- таб `mail`
+- группу `smtp`
+- подгруппу `security`
+- поле `encryption`
+
+Подпись подгруппы можно задать ключом перевода:
+```
+bl_config::config.mail.smtp.security.subgroup_label
+```
+Если перевод отсутствует, используется имя подгруппы с заглавной буквы.
+
 ## Типы полей (`backend_type`)
 Используется `backend_type`.
 Поддерживаются:

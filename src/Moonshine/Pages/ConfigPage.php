@@ -25,6 +25,7 @@ use MoonShine\UI\Components\ActionButton;
 use MoonShine\UI\Components\FormBuilder;
 use MoonShine\UI\Components\Layout\Box;
 use MoonShine\UI\Components\Layout\Flex;
+use MoonShine\UI\Components\Layout\LineBreak;
 use MoonShine\UI\Components\Tabs;
 use MoonShine\UI\Components\Tabs\Tab;
 use MoonShine\UI\Contracts\HasDefaultValueContract;
@@ -202,22 +203,7 @@ class ConfigPage extends Page
                 $canEditGroup = $this->checkPolicy(ConfigPageAbility::EDIT_GROUP, [$section, $group]);
                 $groupReadOnly = !$canEditTab || !$canEditGroup;
 
-                $rawFields = $this->buildGroupFields($configs);
-                $fields = [];
-                foreach ($rawFields as $field) {
-                    if (!$this->checkPolicy(ConfigPageAbility::VIEW_FIELD, [$section, $group, $field])) {
-                        continue;
-                    }
-
-                    $canEditField = $this->checkPolicy(ConfigPageAbility::EDIT_FIELD, [$section, $group, $field]);
-                    $fieldReadOnly = $groupReadOnly || !$canEditField;
-
-                    if ($fieldReadOnly) {
-                        $this->setFieldReadOnly($field);
-                    }
-
-                    $fields[] = $field;
-                }
+                $fields = $this->buildGroupFields($configs, $section, $group, $groupReadOnly);
 
                 if ($fields === []) {
                     continue;
@@ -244,11 +230,17 @@ class ConfigPage extends Page
 
     /**
      * @param  Collection<int, ConfigModel>  $configs
-     * @return list<FieldContract>
+     * @return list<ComponentContract|FieldContract>
      */
-    private function buildGroupFields(Collection $configs): array
+    private function buildGroupFields(
+        Collection $configs,
+        string $section,
+        string $group,
+        bool $groupReadOnly
+    ): array
     {
         $fields = [];
+        $subgroupFields = [];
 
         foreach ($configs as $config) {
             $field = $this->makeField($config);
@@ -257,7 +249,37 @@ class ConfigPage extends Page
                 continue;
             }
 
-            $fields[] = $field;
+            if (!$this->checkPolicy(ConfigPageAbility::VIEW_FIELD, [$section, $group, $field])) {
+                continue;
+            }
+
+            $canEditField = $this->checkPolicy(ConfigPageAbility::EDIT_FIELD, [$section, $group, $field]);
+
+            if ($groupReadOnly || !$canEditField) {
+                $this->setFieldReadOnly($field);
+            }
+
+            $parts = explode('.', $config->coreConfig->path);
+            $subgroup = count($parts) === 4 ? $parts[2] : null;
+
+            if ($subgroup === null || $subgroup === '') {
+                $fields[] = $field;
+
+                continue;
+            }
+
+            $subgroupFields[$subgroup][] = $field;
+        }
+
+        if ($fields === [] && $subgroupFields !== []) {
+            $fields[] = LineBreak::make();
+        }
+
+        foreach ($subgroupFields as $subgroup => $nestedFields) {
+            $fields[] = Fieldset::make(
+                $this->getSubgroupLabel($section, $group, $subgroup),
+                $nestedFields
+            );
         }
 
         return $fields;
@@ -334,6 +356,14 @@ class ConfigPage extends Page
         $label = __($key);
 
         return $label !== $key ? $label : ucfirst($group);
+    }
+
+    private function getSubgroupLabel(string $section, string $group, string $subgroup): string
+    {
+        $key = "bl_config::config.$section.$group.$subgroup.subgroup_label";
+        $label = __($key);
+
+        return $label !== $key ? $label : ucfirst($subgroup);
     }
 
     private function makeField(ConfigModel $config): ?FieldContract
